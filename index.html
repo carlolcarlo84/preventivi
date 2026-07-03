@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f766e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CM IBRIC">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>CM IBRIC - Preventivi</title>
+<style>
+:root {
+  --primary: #0f766e;
+  --primary-dark: #0d5e57;
+  --primary-light: #ccfbf1;
+  --primary-bg: #ecfdf5;
+  --accent: #1e293b;
+  --bg: #f0f4f8;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --transition: 0.2s ease;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Header / Nav */
+.app-header {
+  background: var(--card);
+  border-bottom: 2px solid var(--primary);
+  padding: 0 1.5rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.logo-box {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+.logo-text strong {
+  font-size: 1.15rem;
+  color: var(--accent);
+  line-height: 1.2;
+}
+.logo-text small {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+.btn-outline:hover { background: var(--primary-bg); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #059669; }
+.btn-warning { background: var(--warning); color: #fff; }
+.btn-warning:hover { background: #d97706; }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 6px 10px;
+}
+.btn-ghost:hover { background: var(--bg); color: var(--text); }
+.btn-sm { padding: 5px 10px; font-size: 0.78rem; }
+.btn-icon {
+  width: 36px; height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1rem;
+}
+
+/* Container */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+.stat-card {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow);
+  border-left: 3px solid var(--primary);
+}
+.stat-card .stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+.stat-card .stat-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Table */
+.table-wrap {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+th {
+  text-align: left;
+  padding: 10px 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8fafc; }
+td.actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+/* Forms */
+.form-group { margin-bottom: 1rem; }
+.form-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+input, textarea, select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 0.875rem;
+  color: var(--text);
+  background: var(--card);
+  transition: border-color var(--transition);
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+input.input-sm, select.input-sm { padding: 6px 8px; font-size: 0.82rem; }
+textarea { resize: vertical; min-height: 60px; }
+
+/* Sections inside editor */
+.form-section {
+  margin-bottom: 1.5rem;
+}
+.form-section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--primary-light);
+}
+
+/* Dynamic rows (work items, labor, materials) */
+.dynamic-table { width: 100%; }
+.dynamic-table th {
+  font-size: 0.72rem;
+  padding: 6px 8px;
+}
+.dynamic-table td {
+  padding: 4px 6px;
+  vertical-align: middle;
+}
+.dynamic-table td.actions-cell {
+  width: 40px;
+  text-align: center;
+}
+.btn-remove-row {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 4px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: background var(--transition);
+}
+.btn-remove-row:hover { background: #fef2f2; }
+
+/* Summary */
+.summary-box {
+  background: var(--primary-bg);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  margin-top: 0.5rem;
+}
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.875rem;
+}
+.summary-row.total {
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-top: 2px solid var(--primary);
+  margin-top: 6px;
+  padding-top: 8px;
+  color: var(--primary-dark);
+}
+
+/* Toolbar */
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Notification toast */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--accent);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-lg);
+  z-index: 999;
+  transform: translateY(120%);
+  opacity: 0;
+  transition: all 0.3s ease;
+  max-width: 380px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast-success { background: var(--success); }
+.toast-error { background: var(--danger); }
+
+/* Modal overlay */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 500;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+}
+.modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+.modal-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Pages */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Search + filters */
+.toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+.search-input {
+  flex: 1;
+  min-width: 180px;
+  max-width: 320px;
+}
+.filter-select {
+  width: auto;
+  min-width: 120px;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+.empty-state .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.4;
+}
+.empty-state p {
+  margin-bottom: 1rem;
+}
+
+/* Print template (hidden) */
+#print-template { display: none; }
+
+/* Checkbox row */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.checkbox-row input[type="checkbox"] {
+  width: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app-header { padding: 0 1rem; }
+  .container { padding: 0.75rem; }
+  .card { padding: 1rem; }
+  .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .editor-toolbar { flex-direction: column; }
+  .editor-toolbar .btn { width: 100%; }
+  .nav-actions .btn span { display: none; }
+  .dashboard-actions .btn span { display: none; }
+  .logo-text small { display: none; }
+  .search-input { max-width: 100%; }
+  .table-wrap td.actions { flex-wrap: wrap; }
+}
+
+/* PRINT STYLES */
+@media print {
+  @page { margin: 20mm 15mm; }
+  body { background: #fff; }
+  .app-header, .nav-actions, .editor-toolbar,
+  .modal-overlay, .toast, .btn, .no-print,
+  #page-dashboard, .stats-grid,
+  .toolbar-row, .backup-bar { display: none !important; }
+  #page-editor.active { display: block !important; }
+  .card { box-shadow: none; border: none; padding: 0; margin: 0; }
+  .form-group input, .form-group textarea,
+  .form-group select, .btn-remove-row, .add-row-btn { display: none; }
+  .form-section-title { border-bottom-color: #000; }
+  .dynamic-table td, .dynamic-table th { border-color: #ccc; }
+  .summary-box { border: 1px solid #ccc; }
+  .editor-toolbar { display: none !important; }
+  .print-only { display: block !important; }
+  .form-section-title::after { content: none; }
+  .hide-print { display: none !important; }
+  .summary-row.total { border-top-color: #000; }
+  .form-section { break-inside: avoid; }
+}
+.print-only { display: none; }
+
+/* Install Banner */
+.install-banner {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border-top: 2px solid var(--primary);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+  z-index: 900;
+  padding: 12px 16px;
+  animation: slideUp 0.3s ease;
+}
+.install-banner.show { display: block; }
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.install-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.install-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.install-text {
+  flex: 1;
+  min-width: 0;
+}
+.install-text strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--accent);
+}
+.install-text span {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+.install-banner-ios { display: none; }
+.install-banner-ios.show { display: block; }
+.install-banner-ios .install-banner-content {
+  padding: 8px 0;
+}
+@media (max-width: 480px) {
+  .install-banner-content { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo" onclick="showPage('dashboard')" title="Torna alla dashboard">
+    <div class="logo-box">CM</div>
+    <div class="logo-text">
+      <strong>IBRIC</strong>
+      <small>Draghici Claudiu · Muratura e Pitturazione</small>
+    </div>
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-primary" onclick="openNewQuote()">+ Nuovo</button>
+    <button class="btn btn-ghost" onclick="openSettings()" title="Impostazioni">⚙️</button>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ====== DASHBOARD ====== -->
+<section id="page-dashboard" class="page active">
+  <div class="stats-grid" id="stats-grid"></div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">I tuoi preventivi</h2>
+      <div class="dashboard-actions no-print">
+        <button class="btn btn-primary btn-sm" onclick="openNewQuote()">+ Nuovo</button>
+      </div>
+    </div>
+    <div class="toolbar-row no-print">
+      <input class="search-input" id="search-input" type="text" placeholder="Cerca per cliente o numero..." oninput="renderDashboard()">
+      <select class="filter-select" id="status-filter" onchange="renderDashboard()">
+        <option value="all">Tutti</option>
+        <option value="draft">Bozza</option>
+        <option value="sent">Inviato</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>Data</th>
+            <th>Cliente</th>
+            <th>Totale</th>
+            <th>Stato</th>
+            <th class="no-print">Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="quotes-table-body">
+          <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-secondary);">Nessun preventivo ancora creato.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card no-print">
+    <div class="card-header">
+      <h2 class="card-title">Backup & Ripristino</h2>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem;">
+      Scarica un file con tutti i tuoi preventivi e impostazioni. Conservalo in una cartella o sul cloud.
+      Per trasferire i dati su un altro dispositivo, carica il file.
+    </p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-outline btn-sm" onclick="downloadBackup()">📥 Scarica Backup</button>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('restore-input').click()">📤 Carica Backup</button>
+      <span id="backup-info" style="font-size:0.78rem;color:var(--text-secondary);align-self:center;margin-left:4px;"></span>
+    </div>
+    <input type="file" id="restore-input" accept=".json" style="display:none" onchange="uploadBackup(event)">
+  </div>
+</section>
+
+<!-- ====== EDITOR ====== -->
+<section id="page-editor" class="page">
+  <div class="card">
+    <div id="editor-content"></div>
+  </div>
+</section>
+
+<!-- ====== SETTINGS ====== -->
+<section id="page-settings" class="page">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Impostazioni Azienda</h2>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('dashboard')">← Torna</button>
+    </div>
+    <div class="form-group">
+      <label>Nome Azienda / Ragione Sociale</label>
+      <input id="set-company" type="text" value="CM IBRIC">
+    </div>
+    <div class="form-group">
+      <label>Il tuo nome</label>
+      <input id="set-owner" type="text" value="Draghici Claudiu">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Partita IVA (opzionale)</label>
+        <input id="set-piva" type="text">
+      </div>
+      <div class="form-group">
+        <label>Codice Fiscale (opzionale)</label>
+        <input id="set-cf" type="text">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Indirizzo</label>
+      <input id="set-address" type="text">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Telefono</label>
+        <input id="set-phone" type="text" placeholder="+39 300 000 0000">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input id="set-email" type="email">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Sito Web (opzionale)</label>
+      <input id="set-website" type="text" placeholder="https://">
+    </div>
+    <div class="form-group">
+      <label>Condizioni / Note predefinite</label>
+      <textarea id="set-default-notes" rows="3" placeholder="es. Pagamento: 30% acconto, saldo a fine lavori..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Validità offerta (giorni)</label>
+        <input id="set-default-validity" type="number" value="30" min="1" max="365">
+      </div>
+      <div class="form-group">
+        <label>Colore primario</label>
+        <input id="set-color" type="color" value="#0f766e">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:1rem;">
+      <button class="btn btn-primary" onclick="saveSettings()">💾 Salva Impostazioni</button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- ====== CONFIRM MODAL ====== -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="confirm-title">Conferma</div>
+    <div class="modal-text" id="confirm-text">Sei sicuro?</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-danger" id="confirm-btn" onclick="">Conferma</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== TOAST ====== -->
+<div class="toast" id="toast"></div>
+
+<!-- ====== INSTALL BANNER PWA ====== -->
+<div class="install-banner" id="install-banner">
+  <div class="install-banner-content">
+    <img src="icon.svg" alt="" class="install-icon" width="48" height="48">
+    <div class="install-text">
+      <strong>CM IBRIC</strong>
+      <span>Installa l'app per usarla offline</span>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="installApp()">Installa</button>
+    <button class="btn btn-ghost btn-sm" onclick="hideInstallBanner()">✕</button>
+  </div>
+</div>
+
+<!-- ====== INSTALL BANNER IOS ====== -->
+<div class="install-banner install-banner-ios" id="install-banner-ios">
+  <div class="install-banner-content">
+    <div class="install-text">
+      <strong>CM IBRIC</strong>
+      <span>Aggiungi alla schermata Home per usarla come app</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="hideInstallBannerIOS()">✕</button>
+  </div>
+</div>
+
+<script>
+// ============================================
+// STATE
+// ============================================
+let state = {
+  settings: {
+    company: 'CM IBRIC',
+    owner: 'Draghici Claudiu',
+    piva: '',
+    cf: '',
+    address: '',
+    phone: '',
+    email: '',
+    website: '',
+    defaultNotes: '',
+    defaultValidity: 30,
+    color: '#0f766e'
+  },
+  quotes: [],
+  nextNumber: 1,
+  currentId: null,
+  isNew: true
+};
+let backupNotified = false;
+
+// ============================================
+// INIT
+// ============================================
+function init() {
+  loadData();
+  applyColor();
+  renderDashboard();
+}
+document.addEventListener('DOMContentLoaded', init);
+
+// ============================================
+// DATA PERSISTENCE
+// ============================================
+function loadData() {
+  try {
+    const s = localStorage.getItem('cmibric_state');
+    if (s) {
+      const parsed = JSON.parse(s);
+      state.settings = { ...state.settings, ...parsed.settings };
+      state.quotes = parsed.quotes || [];
+      state.nextNumber = parsed.nextNumber || 1;
+    }
+  } catch (e) { console.warn('load error', e); }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem('cmibric_state', JSON.stringify({
+      settings: state.settings,
+      quotes: state.quotes,
+      nextNumber: state.nextNumber
+    }));
+  } catch (e) { console.warn('save error', e); }
+}
+
+function applyColor() {
+  if (!state.settings.color) return;
+  document.documentElement.style.setProperty('--primary', state.settings.color);
+  document.documentElement.style.setProperty('--primary-dark', adjustBrightness(state.settings.color, -20));
+  document.documentElement.style.setProperty('--primary-light', state.settings.color + '22');
+  document.documentElement.style.setProperty('--primary-bg', state.settings.color + '0d');
+}
+
+function adjustBrightness(hex, percent) {
+  let r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  r = Math.max(0, Math.min(255, r + percent));
+  g = Math.max(0, Math.min(255, g + percent));
+  b = Math.max(0, Math.min(255, b + percent));
+  return '#' + [r,g,b].map(c => c.toString(16).padStart(2,'0')).join('');
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+function openSettings() {
+  showPage('settings');
+}
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'settings') loadSettingsForm();
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (type ? ' toast-' + type : '') + ' show';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ============================================
+// MODAL
+// ============================================
+function showModal(title, text, onConfirm) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-text').textContent = text;
+  document.getElementById('confirm-btn').onclick = function() {
+    closeModal();
+    if (typeof onConfirm === 'function') onConfirm();
+  };
+  document.getElementById('confirm-modal').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('active');
+}
+
+// Close modal on overlay click
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ============================================
+// DASHBOARD
+// ============================================
+function renderDashboard() {
+  const search = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+  const filter = document.getElementById('status-filter')?.value || 'all';
+  const tbody = document.getElementById('quotes-table-body');
+  const statsGrid = document.getElementById('stats-grid');
+
+  let filtered = state.quotes.filter(q => {
+    if (filter !== 'all' && q.status !== filter) return false;
+    if (search) {
+      const client = (q.clientName || '').toLowerCase();
+      const num = (q.num || '').toLowerCase();
+      if (!client.includes(search) && !num.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // Stats
+  const total = state.quotes.length;
+  const sent = state.quotes.filter(q => q.status === 'sent').length;
+  const drafts = total - sent;
+  const sum = state.quotes.reduce((acc, q) => acc + (q.total || 0), 0);
+  statsGrid.innerHTML = `
+    <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Totale Preventivi</div></div>
+    <div class="stat-card"><div class="stat-value">${drafts}</div><div class="stat-label">Bozze</div></div>
+    <div class="stat-card"><div class="stat-value">${sent}</div><div class="stat-label">Inviati</div></div>
+    <div class="stat-card"><div class="stat-value">€ ${fmt(sum)}</div><div class="stat-label">Importo Totale</div></div>
+  `;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-secondary);">
+      ${search ? 'Nessun risultato per la ricerca.' : 'Nessun preventivo ancora creato. Clicca "+ Nuovo" per iniziare!'}
+    </td></tr>`;
+    updateBackupInfo();
+    return;
+  }
+
+  tbody.innerHTML = filtered.sort((a,b) => b.createdAt - a.createdAt).map(q => {
+    const stato = q.status === 'sent' ? '<span style="color:var(--success);font-weight:600;">✓ Inviato</span>' : '<span style="color:var(--warning);font-weight:600;">● Bozza</span>';
+    const clientDisplay = q.clientName || (q.clientSurname ? q.clientSurname + ' ' + q.clientName : '—');
+    return `<tr>
+      <td><strong>${q.num}</strong></td>
+      <td>${q.date}</td>
+      <td>${escHtml(clientDisplay)}</td>
+      <td><strong>€ ${fmt(q.total || 0)}</strong></td>
+      <td>${stato}</td>
+      <td class="actions no-print">
+        <button class="btn btn-ghost btn-sm" onclick="openEditQuote('${q.id}')" title="Modifica">✏️</button>
+        <button class="btn btn-ghost btn-sm" onclick="printQuote('${q.id}')" title="Stampa/PDF">🖨️</button>
+        <button class="btn btn-ghost btn-sm" onclick="shareWhatsApp('${q.id}')" title="Invia WhatsApp">📱</button>
+        <button class="btn btn-ghost btn-sm" onclick="duplicateQuote('${q.id}')" title="Duplica">📋</button>
+        <button class="btn btn-ghost btn-sm" onclick="confirmDeleteQuote('${q.id}')" title="Elimina">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+  updateBackupInfo();
+}
+
+function updateBackupInfo() {
+  const el = document.getElementById('backup-info');
+  if (!el) return;
+  const last = localStorage.getItem('cmibric_last_backup');
+  if (last) {
+    el.textContent = 'Ultimo backup: ' + last;
+  } else {
+    el.textContent = 'Nessun backup ancora effettuato.';
+  }
+}
+
+// ============================================
+// EDITOR
+// ============================================
+function openNewQuote() {
+  state.isNew = true;
+  state.currentId = null;
+  showPage('editor');
+  const num = 'PRE-' + String(state.nextNumber).padStart(3, '0');
+  const d = new Date();
+  const dateStr = d.getDate().toString().padStart(2,'0') + '/' + (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getFullYear();
+  renderEditor({
+    num: num,
+    date: dateStr,
+    clientName: '',
+    clientSurname: '',
+    clientAddress: '',
+    clientPhone: '',
+    clientEmail: '',
+    works: [{ desc: '', qty: 1, price: 0 }],
+    labors: [{ desc: '', amount: 0 }],
+    materials: [{ desc: '', amount: 0 }],
+    notes: state.settings.defaultNotes || '',
+    validity: state.settings.defaultValidity || 30,
+    status: 'draft',
+    total: 0,
+    createdAt: Date.now()
+  });
+}
+
+function openEditQuote(id) {
+  const q = state.quotes.find(x => x.id === id);
+  if (!q) { showToast('Preventivo non trovato', 'error'); return; }
+  state.isNew = false;
+  state.currentId = id;
+  showPage('editor');
+  renderEditor(q);
+}
+
+function renderEditor(q) {
+  const s = state.settings;
+  const container = document.getElementById('editor-content');
+
+  const worksHtml = q.works.map((w, i) => `
+    <tr>
+      <td style="text-align:center;font-weight:600;"></td>
+      <td><input class="input-sm" type="text" value="${escAttr(w.desc)}" placeholder="Descrizione lavoro" style="min-width:120px;"></td>
+      <td><input class="input-sm" type="number" value="${w.qty}" min="0" step="1" style="width:60px;" oninput="recalcEditor()"></td>
+      <td><input class="input-sm" type="number" value="${w.price}" min="0" step="0.01" style="width:90px;" oninput="recalcEditor()"></td>
+      <td style="text-align:right;font-weight:600;">€ <span>${fmt(w.qty * w.price)}</span></td>
+      <td class="actions-cell"><button class="btn-remove-row" onclick="removeWorkRow(this)">×</button></td>
+    </tr>
+  `).join('');
+
+  const laborsHtml = q.labors.map((l, i) => `
+    <tr>
+      <td><input class="input-sm" type="text" value="${escAttr(l.desc)}" placeholder="es. 2 operai x 3 giorni" style="min-width:120px;"></td>
+      <td><input class="input-sm" type="number" value="${l.amount}" min="0" step="0.01" style="width:110px;" oninput="recalcEditor()"></td>
+      <td class="actions-cell"><button class="btn-remove-row" onclick="removeLaborRow(this)">×</button></td>
+    </tr>
+  `).join('');
+
+  const materialsHtml = q.materials.map((m, i) => `
+    <tr>
+      <td><input class="input-sm" type="text" value="${escAttr(m.desc)}" placeholder="es. Pittura lavabile 5L" style="min-width:120px;"></td>
+      <td><input class="input-sm" type="number" value="${m.amount}" min="0" step="0.01" style="width:110px;" oninput="recalcEditor()"></td>
+      <td class="actions-cell"><button class="btn-remove-row" onclick="removeMaterialRow(this)">×</button></td>
+    </tr>
+  `).join('');
+
+  container.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:1.25rem;">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="logo" style="cursor:default;">
+          <div class="logo-box" style="font-size:1rem;">CM</div>
+          <div class="logo-text">
+            <strong style="font-size:1rem;">IBRIC</strong>
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:1.1rem;color:var(--primary);">${q.num}</div>
+          <div style="font-size:0.82rem;color:var(--text-secondary);">${q.date}</div>
+        </div>
+      </div>
+      <input type="hidden" id="editor-num" value="${q.num}">
+      <input type="hidden" id="editor-date" value="${q.date}">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:0.82rem;color:var(--text-secondary);">Stato:</span>
+        <select id="editor-status" style="width:auto;padding:4px 8px;font-size:0.82rem;">
+          <option value="draft" ${q.status === 'draft' ? 'selected' : ''}>● Bozza</option>
+          <option value="sent" ${q.status === 'sent' ? 'selected' : ''}>✓ Inviato</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Dati Cliente</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome</label>
+          <input id="editor-client-name" type="text" value="${escAttr(q.clientName)}">
+        </div>
+        <div class="form-group">
+          <label>Cognome</label>
+          <input id="editor-client-surname" type="text" value="${escAttr(q.clientSurname)}">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Indirizzo</label>
+        <input id="editor-client-address" type="text" value="${escAttr(q.clientAddress)}">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Telefono</label>
+          <input id="editor-client-phone" type="text" value="${escAttr(q.clientPhone)}">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input id="editor-client-email" type="email" value="${escAttr(q.clientEmail)}">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Lavori Previsti</div>
+      <div class="table-wrap">
+        <table class="dynamic-table" id="works-table">
+          <thead>
+            <tr><th style="width:30px;">#</th><th>Descrizione</th><th style="width:60px;">Qtà</th><th style="width:90px;">€/Unità</th><th style="width:90px;">Importo</th><th style="width:30px;"></th></tr>
+          </thead>
+          <tbody>${worksHtml}</tbody>
+        </table>
+      </div>
+      <button class="btn btn-ghost btn-sm add-row-btn" onclick="addWorkRow()" style="margin-top:6px;">+ Aggiungi lavoro</button>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Manodopera</div>
+      <div class="table-wrap">
+        <table class="dynamic-table" id="labors-table">
+          <thead>
+            <tr><th>Descrizione</th><th style="width:110px;">Importo €</th><th style="width:30px;"></th></tr>
+          </thead>
+          <tbody>${laborsHtml}</tbody>
+        </table>
+      </div>
+      <button class="btn btn-ghost btn-sm add-row-btn" onclick="addLaborRow()" style="margin-top:6px;">+ Aggiungi manodopera</button>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Materiali</div>
+      <div class="table-wrap">
+        <table class="dynamic-table" id="materials-table">
+          <thead>
+            <tr><th>Descrizione</th><th style="width:110px;">Importo €</th><th style="width:30px;"></th></tr>
+          </thead>
+          <tbody>${materialsHtml}</tbody>
+        </table>
+      </div>
+      <button class="btn btn-ghost btn-sm add-row-btn" onclick="addMaterialRow()" style="margin-top:6px;">+ Aggiungi materiale</button>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Riepilogo</div>
+      <div class="summary-box" id="summary-box">
+        <div class="summary-row"><span>Totale Lavori</span><span>€ <span id="sum-works">0,00</span></span></div>
+        <div class="summary-row"><span>Totale Manodopera</span><span>€ <span id="sum-labors">0,00</span></span></div>
+        <div class="summary-row"><span>Totale Materiali</span><span>€ <span id="sum-materials">0,00</span></span></div>
+        <div class="summary-row total"><span>TOTALE COMPLESSIVO</span><span>€ <span id="sum-total">0,00</span></span></div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Note e Condizioni</div>
+      <div class="form-group">
+        <textarea id="editor-notes" rows="3" placeholder="Condizioni di pagamento, tempistiche, note varie...">${escAttr(q.notes)}</textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Validità offerta (giorni)</label>
+          <input id="editor-validity" type="number" value="${q.validity || 30}" min="1" max="365" style="width:100px;">
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-toolbar no-print">
+      <button class="btn btn-primary" onclick="saveQuote()">💾 Salva</button>
+      <button class="btn btn-outline" onclick="saveQuoteAndPrint()">🖨️ Stampa / PDF</button>
+      <button class="btn btn-outline" onclick="saveQuoteThenShare()">📱 Condividi</button>
+      <button class="btn btn-ghost" onclick="showPage('dashboard')">← Tutti i preventivi</button>
+    </div>
+  `;
+
+  recalcEditor();
+}
+
+function recalcEditor() {
+  const sumWorks = sumDynamicRows('works');
+  const sumLabors = sumDynamicRows('labors');
+  const sumMaterials = sumDynamicRows('materials');
+  const total = sumWorks + sumLabors + sumMaterials;
+  document.getElementById('sum-works').textContent = fmt(sumWorks);
+  document.getElementById('sum-labors').textContent = fmt(sumLabors);
+  document.getElementById('sum-materials').textContent = fmt(sumMaterials);
+  document.getElementById('sum-total').textContent = fmt(total);
+}
+
+function sumDynamicRows(type) {
+  const body = document.getElementById(type + '-table')?.querySelector('tbody');
+  if (!body) return 0;
+  let sum = 0;
+  if (type === 'works') {
+    body.querySelectorAll('tr').forEach(tr => {
+      const inputs = tr.querySelectorAll('input');
+      const qty = parseFloat(inputs[1]?.value) || 0;
+      const price = parseFloat(inputs[2]?.value) || 0;
+      const total = qty * price;
+      const spans = tr.querySelectorAll('span');
+      if (spans.length > 0) spans[0].textContent = fmt(total);
+      sum += total;
+    });
+  } else if (type === 'labors') {
+    body.querySelectorAll('tr').forEach(tr => {
+      const inputs = tr.querySelectorAll('input');
+      sum += parseFloat(inputs[1]?.value) || 0;
+    });
+  } else if (type === 'materials') {
+    body.querySelectorAll('tr').forEach(tr => {
+      const inputs = tr.querySelectorAll('input');
+      sum += parseFloat(inputs[1]?.value) || 0;
+    });
+  }
+  return sum;
+}
+
+// Add / Remove rows
+function addWorkRow() {
+  const tbody = document.querySelector('#works-table tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="text-align:center;font-weight:600;"></td>
+    <td><input class="input-sm" type="text" placeholder="Descrizione lavoro" style="min-width:120px;"></td>
+    <td><input class="input-sm" type="number" value="1" min="0" step="1" style="width:60px;" oninput="recalcEditor()"></td>
+    <td><input class="input-sm" type="number" value="0" min="0" step="0.01" style="width:90px;" oninput="recalcEditor()"></td>
+    <td style="text-align:right;font-weight:600;">€ <span>0,00</span></td>
+    <td class="actions-cell"><button class="btn-remove-row" onclick="removeWorkRow(this)">×</button></td>
+  `;
+  tbody.appendChild(tr);
+  reindexRows('works');
+  recalcEditor();
+}
+function removeWorkRow(btn) {
+  const tbody = document.querySelector('#works-table tbody');
+  if (!tbody || tbody.children.length <= 1) return;
+  const tr = btn.closest('tr');
+  if (tr) tr.remove();
+  reindexRows('works');
+  recalcEditor();
+}
+
+function addLaborRow() {
+  const tbody = document.querySelector('#labors-table tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input class="input-sm" type="text" placeholder="es. 2 operai x 3 giorni" style="min-width:120px;"></td>
+    <td><input class="input-sm" type="number" value="0" min="0" step="0.01" style="width:110px;" oninput="recalcEditor()"></td>
+    <td class="actions-cell"><button class="btn-remove-row" onclick="removeLaborRow(this)">×</button></td>
+  `;
+  tbody.appendChild(tr);
+  reindexRows('labors');
+  recalcEditor();
+}
+function removeLaborRow(btn) {
+  const tbody = document.querySelector('#labors-table tbody');
+  if (!tbody || tbody.children.length <= 1) return;
+  const tr = btn.closest('tr');
+  if (tr) tr.remove();
+  reindexRows('labors');
+  recalcEditor();
+}
+
+function addMaterialRow() {
+  const tbody = document.querySelector('#materials-table tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input class="input-sm" type="text" placeholder="es. Pittura lavabile 5L" style="min-width:120px;"></td>
+    <td><input class="input-sm" type="number" value="0" min="0" step="0.01" style="width:110px;" oninput="recalcEditor()"></td>
+    <td class="actions-cell"><button class="btn-remove-row" onclick="removeMaterialRow(this)">×</button></td>
+  `;
+  tbody.appendChild(tr);
+  reindexRows('materials');
+  recalcEditor();
+}
+function removeMaterialRow(btn) {
+  const tbody = document.querySelector('#materials-table tbody');
+  if (!tbody || tbody.children.length <= 1) return;
+  const tr = btn.closest('tr');
+  if (tr) tr.remove();
+  reindexRows('materials');
+  recalcEditor();
+}
+
+function reindexRows(type) {
+  const tbody = document.querySelector('#' + type + '-table tbody');
+  if (!tbody) return;
+  tbody.querySelectorAll('tr').forEach((tr, i) => {
+    if (type === 'works') {
+      const firstTd = tr.querySelector('td');
+      if (firstTd) firstTd.textContent = i + 1;
+    }
+  });
+}
+
+// ============================================
+// SAVE QUOTE
+// ============================================
+function readEditorData() {
+  const works = [];
+  document.querySelectorAll('#works-table tbody tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    const desc = inputs[0]?.value || '';
+    const qty = parseFloat(inputs[1]?.value) || 0;
+    const price = parseFloat(inputs[2]?.value) || 0;
+    works.push({ desc, qty, price });
+  });
+  const labors = [];
+  document.querySelectorAll('#labors-table tbody tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    const desc = inputs[0]?.value || '';
+    const amount = parseFloat(inputs[1]?.value) || 0;
+    labors.push({ desc, amount });
+  });
+  const materials = [];
+  document.querySelectorAll('#materials-table tbody tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    const desc = inputs[0]?.value || '';
+    const amount = parseFloat(inputs[1]?.value) || 0;
+    materials.push({ desc, amount });
+  });
+
+  const sumWorks = works.reduce((a, w) => a + w.qty * w.price, 0);
+  const sumLabors = labors.reduce((a, l) => a + l.amount, 0);
+  const sumMaterials = materials.reduce((a, m) => a + m.amount, 0);
+
+  return {
+    clientName: document.getElementById('editor-client-name')?.value || '',
+    clientSurname: document.getElementById('editor-client-surname')?.value || '',
+    clientAddress: document.getElementById('editor-client-address')?.value || '',
+    clientPhone: document.getElementById('editor-client-phone')?.value || '',
+    clientEmail: document.getElementById('editor-client-email')?.value || '',
+    works,
+    labors,
+    materials,
+    total: sumWorks + sumLabors + sumMaterials,
+    notes: document.getElementById('editor-notes')?.value || '',
+    validity: parseInt(document.getElementById('editor-validity')?.value) || 30,
+    status: document.getElementById('editor-status')?.value || 'draft'
+  };
+}
+
+function saveQuoteData(silent) {
+  const data = readEditorData();
+  const num = document.getElementById('editor-num')?.value || 'PRE-000';
+  const date = document.getElementById('editor-date')?.value || '';
+
+  const now = Date.now();
+  let quote;
+  if (state.isNew) {
+    const id = 'q_' + now + '_' + Math.random().toString(36).substr(2, 6);
+    quote = {
+      id,
+      num,
+      date: date || (() => {
+        const d = new Date();
+        return d.getDate().toString().padStart(2,'0') + '/' + (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getFullYear();
+      })(),
+      createdAt: now,
+      updatedAt: now,
+      ...data
+    };
+    state.quotes.push(quote);
+    state.nextNumber++;
+  } else {
+    quote = state.quotes.find(q => q.id === state.currentId);
+    if (!quote) { showToast('Errore: preventivo non trovato', 'error'); return false; }
+    Object.assign(quote, { ...data, updatedAt: now, date: date });
+  }
+  saveData();
+  if (!silent) showToast('Preventivo ' + quote.num + ' salvato!', 'success');
+  backupNotified = false;
+  return quote;
+}
+
+function saveQuote() {
+  const q = saveQuoteData(false);
+  if (q) showPage('dashboard');
+}
+
+function saveQuoteAndPrint() {
+  const q = saveQuoteData(true);
+  if (q) {
+    state.currentId = q.id;
+    state.isNew = false;
+    setTimeout(() => { try { printQuote(q.id); } catch(e) {} showPage('dashboard'); }, 300);
+  }
+}
+
+async function saveQuoteThenShare() {
+  const q = saveQuoteData(true);
+  if (q) {
+    state.currentId = q.id;
+    state.isNew = false;
+    setTimeout(async () => {
+      const shared = await shareQuoteFile(q.id);
+      if (!shared) shareWhatsAppText(state.quotes.find(x => x.id === q.id));
+      showPage('dashboard');
+    }, 300);
+  }
+}
+
+// ============================================
+// DELETE / DUPLICATE
+// ============================================
+function confirmDeleteQuote(id) {
+  const q = state.quotes.find(x => x.id === id);
+  if (!q) return;
+  showModal('Elimina preventivo', 'Eliminare definitivamente il preventivo ' + q.num + '?', () => {
+    state.quotes = state.quotes.filter(x => x.id !== id);
+    saveData();
+    showToast('Preventivo eliminato', 'success');
+    renderDashboard();
+  });
+}
+
+function duplicateQuote(id) {
+  const q = state.quotes.find(x => x.id === id);
+  if (!q) return;
+  const newId = 'q_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const newNum = 'PRE-' + String(state.nextNumber).padStart(3, '0');
+  const d = new Date();
+  const dateStr = d.getDate().toString().padStart(2,'0') + '/' + (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getFullYear();
+  const copy = JSON.parse(JSON.stringify(q));
+  copy.id = newId;
+  copy.num = newNum;
+  copy.date = dateStr;
+  copy.createdAt = Date.now();
+  copy.updatedAt = Date.now();
+  copy.status = 'draft';
+  state.quotes.push(copy);
+  state.nextNumber++;
+  saveData();
+  showToast('Preventivo duplicato come ' + newNum, 'success');
+  renderDashboard();
+}
+
+// ============================================
+// PRINT
+// ============================================
+function generatePrintHTML(q) {
+  const s = state.settings;
+  const worksRows = q.works.map((w, i) =>
+    `<tr><td style="text-align:center;">${i+1}</td><td>${escHtml(w.desc)}</td><td style="text-align:center;">${w.qty}</td><td style="text-align:right;">€ ${fmt(w.price)}</td><td style="text-align:right;font-weight:600;">€ ${fmt(w.qty * w.price)}</td></tr>`
+  ).join('');
+  const laborsRows = q.labors.filter(l => l.desc || l.amount).map(l =>
+    `<tr><td>${escHtml(l.desc)}</td><td style="text-align:right;font-weight:600;">€ ${fmt(l.amount)}</td></tr>`
+  ).join('') || '<tr><td style="color:#64748b;">—</td><td></td></tr>';
+  const materialsRows = q.materials.filter(m => m.desc || m.amount).map(m =>
+    `<tr><td>${escHtml(m.desc)}</td><td style="text-align:right;font-weight:600;">€ ${fmt(m.amount)}</td></tr>`
+  ).join('') || '<tr><td style="color:#64748b;">—</td><td></td></tr>';
+  const sumWorks = q.works.reduce((a, w) => a + w.qty * w.price, 0);
+  const sumLabors = q.labors.reduce((a, l) => a + l.amount, 0);
+  const sumMaterials = q.materials.reduce((a, m) => a + m.amount, 0);
+  const total = sumWorks + sumLabors + sumMaterials;
+  const client = [q.clientSurname, q.clientName].filter(Boolean).join(' ');
+  const c = s.color || '#0f766e';
+
+  return `<!DOCTYPE html><html lang="it"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${q.num} - CM IBRIC</title>
+<style>
+  @page { margin: 20mm 15mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #1e293b; font-size: 14px; line-height: 1.5; padding: 10px; }
+  .print-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 3px solid ${c}; }
+  .logo-area { display: flex; align-items: center; gap: 12px; }
+  .logo-text { display: flex; flex-direction: column; }
+  .logo-text strong { font-size: 1.3rem; }
+  .logo-text small { font-size: 0.75rem; color: #64748b; }
+  .company-info { text-align: right; font-size: 0.82rem; color: #475569; }
+  .quote-title { font-size: 1.3rem; font-weight: 700; color: ${c}; margin-bottom: 0.25rem; }
+  .section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: ${c}; margin-top: 1.5rem; margin-bottom: 0.5rem; padding-bottom: 4px; border-bottom: 1px solid #e2e8f0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { text-align: left; padding: 8px 10px; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; font-size: 0.75rem; text-transform: uppercase; }
+  td { padding: 7px 10px; border-bottom: 1px solid #f1f5f9; }
+  .summary-table td { border: none; padding: 4px 10px; }
+  .total-row td { font-weight: 700; font-size: 1.05rem; border-top: 2px solid ${c}; padding-top: 8px; color: ${c}; }
+  .notes { margin-top: 1.5rem; padding: 1rem; background: #f8fafc; border-radius: 6px; font-size: 0.82rem; color: #475569; }
+  .footer { margin-top: 2rem; text-align: center; font-size: 0.75rem; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 1rem; }
+  .validity { margin-top: 0.5rem; font-size: 0.82rem; color: #64748b; }
+  .client-card { padding: 0.75rem; background: #f8fafc; border-radius: 6px; border-left: 3px solid ${c}; }
+  .logo-img { width:56px; height:56px; border-radius:8px; flex-shrink:0; }
+  @media (max-width:600px) { .print-header { flex-direction: column; gap: 8px; } .company-info { text-align: left; } }
+</style>
+</head><body>
+<div class="print-header">
+  <div class="logo-area">
+    <img src="./icon.svg" alt="CM IBRIC" class="logo-img" onerror="this.style.display='none'">
+    <div class="logo-text">
+      <strong>IBRIC</strong>
+      <small>${escHtml(s.owner)}</small>
+    </div>
+  </div>
+  <div class="company-info">
+    ${escHtml(s.company)}<br>
+    ${escHtml(s.owner)}<br>
+    ${s.address ? escHtml(s.address) + '<br>' : ''}
+    ${s.phone ? 'Tel: ' + escHtml(s.phone) + '<br>' : ''}
+    ${s.email ? escHtml(s.email) + '<br>' : ''}
+    ${s.piva ? 'P.IVA: ' + escHtml(s.piva) : ''}
+    ${s.cf && !s.piva ? 'C.F.: ' + escHtml(s.cf) : ''}
+  </div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
+  <div>
+    <div class="quote-title">${q.num}</div>
+    <div style="color:#64748b;font-size:0.85rem;">Data: ${q.date}</div>
+  </div>
+  <div style="text-align:right;">
+    <span style="display:inline-block;padding:4px 12px;border-radius:4px;font-size:0.78rem;font-weight:600;${q.status === 'sent' ? 'background:#d1fae5;color:#065f46;' : 'background:#fef3c7;color:#92400e;'}">${q.status === 'sent' ? '✓ INVIATO' : '● BOZZA'}</span>
+  </div>
+</div>
+<div class="client-card">
+  <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;color:${c};margin-bottom:4px;">Cliente</div>
+  <div style="font-weight:600;font-size:1rem;">${client || '—'}</div>
+  ${q.clientAddress ? '<div>' + escHtml(q.clientAddress) + '</div>' : ''}
+  ${q.clientPhone ? '<div>Tel: ' + escHtml(q.clientPhone) + '</div>' : ''}
+  ${q.clientEmail ? '<div>' + escHtml(q.clientEmail) + '</div>' : ''}
+</div>
+<div class="section-title">Lavori Previsti</div>
+<table>
+  <thead><tr><th style="width:30px;">#</th><th>Descrizione</th><th style="width:50px;">Qtà</th><th style="width:90px;">€/Unità</th><th style="width:90px;">Importo</th></tr></thead>
+  <tbody>${worksRows}</tbody>
+</table>
+<div class="section-title">Manodopera</div>
+<table>
+  <thead><tr><th>Descrizione</th><th style="width:110px;">Importo</th></tr></thead>
+  <tbody>${laborsRows}</tbody>
+</table>
+<div class="section-title">Materiali</div>
+<table>
+  <thead><tr><th>Descrizione</th><th style="width:110px;">Importo</th></tr></thead>
+  <tbody>${materialsRows}</tbody>
+</table>
+<div class="section-title">Riepilogo</div>
+<table class="summary-table" style="max-width:350px;margin-left:auto;">
+  <tr><td>Totale Lavori</td><td style="text-align:right;">€ ${fmt(sumWorks)}</td></tr>
+  <tr><td>Totale Manodopera</td><td style="text-align:right;">€ ${fmt(sumLabors)}</td></tr>
+  <tr><td>Totale Materiali</td><td style="text-align:right;">€ ${fmt(sumMaterials)}</td></tr>
+  <tr class="total-row"><td>TOTALE COMPLESSIVO</td><td style="text-align:right;">€ ${fmt(total)}</td></tr>
+</table>
+${q.notes ? '<div class="notes"><strong>Note e condizioni:</strong><br>' + escHtml(q.notes).replace(/\n/g, '<br>') + '</div>' : ''}
+${q.validity ? '<div class="validity">Offerta valida ' + q.validity + ' giorni</div>' : ''}
+<div class="footer">
+  ${escHtml(s.company)} - ${escHtml(s.owner)} - ${s.piva ? 'P.IVA ' + escHtml(s.piva) : ''} ${s.phone ? ' - Tel. ' + escHtml(s.phone) : ''}
+</div>
+</body></html>`;
+}
+
+function downloadPrintHTML(q) {
+  const html = generatePrintHTML(q);
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'CM-IBRIC_' + q.num.replace(/[^a-zA-Z0-9]/g, '_') + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('File scaricato. Aprilo per stamparlo.', 'success');
+}
+
+function generatePrint(q) {
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.top = '-9999px';
+  iframe.style.left = '-9999px';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  document.body.appendChild(iframe);
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(generatePrintHTML(q));
+  doc.close();
+  iframe.contentWindow.print();
+  function rm() { try { document.body.removeChild(iframe); } catch(e) {} }
+  iframe.contentWindow.onafterprint = rm;
+  setTimeout(rm, 30000);
+}
+
+function printQuote(id) {
+  const q = state.quotes.find(x => x.id === id);
+  if (!q) { showToast('Preventivo non trovato', 'error'); return; }
+  state.currentId = q.id;
+  if (isStandalone() || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    downloadPrintHTML(q);
+  } else {
+    generatePrint(q);
+  }
+}
+
+// ============================================
+// WHATSAPP
+// ============================================
+async function shareQuoteFile(id) {
+  const q = state.quotes.find(x => x.id === id);
+  if (!q) { showToast('Preventivo non trovato', 'error'); return false; }
+
+  const html = generatePrintHTML(q);
+  const fileName = 'CM-IBRIC_' + q.num.replace(/[^a-zA-Z0-9]/g, '_') + '.html';
+  const blob = new Blob([html], { type: 'text/html' });
+  const file = new File([blob], fileName, { type: 'text/html' });
+
+  if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: 'Preventivo ' + q.num + ' - CM IBRIC' });
+      return true;
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        // Web Share with file failed, fall through
+        return false;
+      }
+      return true; // User cancelled
+    }
+  }
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: 'Preventivo ' + q.num + ' - CM IBRIC',
+        text: 'Preventivo ' + q.num + ' - CM IBRIC\nApri il file allegato o contattami per info.'
+      });
+      return true;
+    } catch (e) {
+      if (e.name !== 'AbortError') return false;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function shareWhatsAppText(q) {
+  if (!q) return;
+  const s = state.settings;
+  const client = [q.clientSurname, q.clientName].filter(Boolean).join(' ');
+  const sumWorks = q.works.reduce((a, w) => a + w.qty * w.price, 0);
+  const sumLabors = q.labors.reduce((a, l) => a + l.amount, 0);
+  const sumMaterials = q.materials.reduce((a, m) => a + m.amount, 0);
+  const total = sumWorks + sumLabors + sumMaterials;
+
+  let msg = `PREVENTIVO ${q.num}\n${s.company} - ${s.owner}\n`;
+  if (s.phone) msg += `Tel: ${s.phone}\n`;
+  msg += `\nCliente: ${client || '—'}\n`;
+  if (q.clientAddress) msg += `Indirizzo: ${q.clientAddress}\n`;
+  msg += `Data: ${q.date}\n\n`;
+
+  if (q.works.some(w => w.desc || w.qty || w.price)) {
+    msg += `━ LAVORI ━\n`;
+    q.works.filter(w => w.desc || w.qty || w.price).forEach((w, i) => {
+      const line = w.desc + (w.qty && w.price ? ` - ${w.qty} x €${fmt(w.price)} = €${fmt(w.qty * w.price)}` : '');
+      if (line.trim()) msg += `${i+1}. ${line}\n`;
+    });
+    msg += `Totale Lavori: €${fmt(sumWorks)}\n\n`;
+  }
+  if (q.labors.some(l => l.desc || l.amount)) {
+    msg += `━ MANODOPERA ━\n`;
+    q.labors.filter(l => l.desc || l.amount).forEach(l => {
+      msg += `${l.desc ? l.desc + ': ' : ''}€${fmt(l.amount)}\n`;
+    });
+    msg += `Totale Manodopera: €${fmt(sumLabors)}\n\n`;
+  }
+  if (q.materials.some(m => m.desc || m.amount)) {
+    msg += `━ MATERIALI ━\n`;
+    q.materials.filter(m => m.desc || m.amount).forEach(m => {
+      msg += `${m.desc ? m.desc + ': ' : ''}€${fmt(m.amount)}\n`;
+    });
+    msg += `Totale Materiali: €${fmt(sumMaterials)}\n\n`;
+  }
+  msg += `TOTALE COMPLESSIVO: €${fmt(total)}\n`;
+  if (q.validity) msg += `\nOfferta valida ${q.validity} giorni\n`;
+  if (q.notes) msg += `\n${q.notes}\n`;
+
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function shareWhatsApp(id) {
+  const q = state.quotes.find(x => x.id === id);
+  if (!q) return;
+  shareQuoteFile(id).then(shared => {
+    if (!shared) shareWhatsAppText(q);
+  });
+}
+
+// ============================================
+// SETTINGS
+// ============================================
+function loadSettingsForm() {
+  const s = state.settings;
+  document.getElementById('set-company').value = s.company || '';
+  document.getElementById('set-owner').value = s.owner || '';
+  document.getElementById('set-piva').value = s.piva || '';
+  document.getElementById('set-cf').value = s.cf || '';
+  document.getElementById('set-address').value = s.address || '';
+  document.getElementById('set-phone').value = s.phone || '';
+  document.getElementById('set-email').value = s.email || '';
+  document.getElementById('set-website').value = s.website || '';
+  document.getElementById('set-default-notes').value = s.defaultNotes || '';
+  document.getElementById('set-default-validity').value = s.defaultValidity || 30;
+  document.getElementById('set-color').value = s.color || '#0f766e';
+}
+
+function saveSettings() {
+  state.settings.company = document.getElementById('set-company').value.trim() || 'CM IBRIC';
+  state.settings.owner = document.getElementById('set-owner').value.trim() || 'Draghici Claudiu';
+  state.settings.piva = document.getElementById('set-piva').value.trim();
+  state.settings.cf = document.getElementById('set-cf').value.trim();
+  state.settings.address = document.getElementById('set-address').value.trim();
+  state.settings.phone = document.getElementById('set-phone').value.trim();
+  state.settings.email = document.getElementById('set-email').value.trim();
+  state.settings.website = document.getElementById('set-website').value.trim();
+  state.settings.defaultNotes = document.getElementById('set-default-notes').value.trim();
+  state.settings.defaultValidity = parseInt(document.getElementById('set-default-validity').value) || 30;
+  state.settings.color = document.getElementById('set-color').value || '#0f766e';
+  saveData();
+  applyColor();
+  showToast('Impostazioni salvate!', 'success');
+}
+
+// ============================================
+// BACKUP / RESTORE
+// ============================================
+function downloadBackup() {
+  const data = {
+    version: 1,
+    backupDate: new Date().toISOString(),
+    settings: state.settings,
+    nextNumber: state.nextNumber,
+    quotes: state.quotes
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const dateStr = new Date().toLocaleDateString('it-IT').replace(/\//g, '-');
+  a.download = 'cmibric-backup-' + dateStr + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  localStorage.setItem('cmibric_last_backup', dateStr);
+  backupNotified = false;
+  showToast('Backup scaricato!', 'success');
+  updateBackupInfo();
+}
+
+function uploadBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.quotes || !data.settings) {
+        showToast('File non valido', 'error');
+        return;
+      }
+      showModal('Carica Backup',
+        'Come vuoi gestire i dati esistenti?',
+        null
+      );
+      // Custom modal with options
+      const modal = document.getElementById('confirm-modal');
+      modal.innerHTML = `
+        <div class="modal-box">
+          <div class="modal-title">Carica Backup</div>
+          <div class="modal-text">Trovati ${data.quotes.length} preventivi. Scegli come procedere:</div>
+          <div class="modal-actions" style="flex-direction:column;gap:8px;">
+            <button class="btn btn-primary" style="width:100%;" onclick="mergeBackup(0)">Sostituisci tutto</button>
+            <button class="btn btn-outline" style="width:100%;" onclick="mergeBackup(1)">Unisci (aggiungi senza duplicati)</button>
+            <button class="btn btn-ghost" style="width:100%;" onclick="closeModal()">Annulla</button>
+          </div>
+        </div>
+      `;
+      // Store backup data for later use
+      window._backupData = data;
+    } catch (e) {
+      showToast('Errore nel leggere il file', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+window.mergeBackup = function(mode) {
+  closeModal();
+  const data = window._backupData;
+  if (!data) return;
+  if (mode === 0) {
+    // Replace all
+    state.settings = data.settings;
+    state.nextNumber = data.nextNumber;
+    state.quotes = data.quotes;
+    saveData();
+    showToast('Backup ripristinato! (' + data.quotes.length + ' preventivi)', 'success');
+  } else {
+    // Merge - add quotes that don't exist by id
+    const existingIds = new Set(state.quotes.map(q => q.id));
+    let added = 0;
+    data.quotes.forEach(q => {
+      if (!existingIds.has(q.id)) {
+        state.quotes.push(q);
+        existingIds.add(q.id);
+        added++;
+      }
+    });
+    if (data.nextNumber > state.nextNumber) state.nextNumber = data.nextNumber;
+    saveData();
+    showToast('Unione completata: ' + added + ' nuovi preventivi aggiunti', 'success');
+  }
+  applyColor();
+  renderDashboard();
+};
+
+// ============================================
+// PWA - INSTALL PROMPT
+// ============================================
+let deferredInstallPrompt = null;
+
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches ||
+         window.navigator.standalone === true;
+}
+
+function showInstallBanner() {
+  const b = document.getElementById('install-banner');
+  if (b) b.classList.add('show');
+}
+
+function hideInstallBanner() {
+  const b = document.getElementById('install-banner');
+  if (b) b.classList.remove('show');
+  localStorage.setItem('cmibric_dismiss_install', '1');
+}
+
+function hideInstallBannerIOS() {
+  const b = document.getElementById('install-banner-ios');
+  if (b) b.classList.remove('show');
+  localStorage.setItem('cmibric_dismiss_install_ios', '1');
+}
+
+function installApp() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(function(choice) {
+    deferredInstallPrompt = null;
+    hideInstallBanner();
+  });
+}
+
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  if (!isStandalone() && !localStorage.getItem('cmibric_dismiss_install')) {
+    showInstallBanner();
+  }
+});
+
+window.addEventListener('appinstalled', function() {
+  deferredInstallPrompt = null;
+  hideInstallBanner();
+});
+
+// iOS detection for Safari install prompt
+(function() {
+  if (isStandalone()) return;
+  var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS && !localStorage.getItem('cmibric_dismiss_install_ios')) {
+    var b = document.getElementById('install-banner-ios');
+    if (b) b.classList.add('show');
+  }
+})();
+
+// ============================================
+// SERVICE WORKER
+// ============================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js').catch(function() {});
+  });
+}
+
+// ============================================
+// UTILITY
+// ============================================
+function fmt(n) {
+  return (n || 0).toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function escHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+function escAttr(s) {
+  if (!s) return '';
+  return s.replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ============================================
+// KEYBOARD SHORTCUTS
+// ============================================
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key === 's') {
+    e.preventDefault();
+    const editor = document.getElementById('page-editor');
+    if (editor.classList.contains('active')) {
+      saveQuote();
+    }
+  }
+});
+
+// ============================================
+// BACKUP REMINDER (periodic)
+// ============================================
+setInterval(function() {
+  if (state.quotes.length > 0 && !backupNotified) {
+    const last = localStorage.getItem('cmibric_last_backup');
+    let remind = false;
+    if (!last) {
+      remind = true;
+    } else {
+      try {
+        const parts = last.split('-');
+        const d = new Date(parts[2], parts[1]-1, parts[0]);
+        const daysSince = Math.floor((Date.now() - d.getTime()) / 86400000);
+        if (daysSince > 7) remind = true;
+      } catch (e) { remind = true; }
+    }
+    if (remind) {
+      backupNotified = true;
+      showToast('⏰ Ricorda di scaricare un backup dei preventivi!', '');
+    }
+  }
+}, 300000); // Check every 5 minutes
+
+</script>
+</body>
+</html>
