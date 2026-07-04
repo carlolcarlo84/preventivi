@@ -815,7 +815,7 @@ async function syncFromCloud() {
   if (!currentUser) return;
   syncInProgress = true;
   try {
-    const doc = await fireDb.collection('users').doc(currentUser.uid).get();
+    const doc = await fireDb.collection('preventivi').doc('main').get();
     const localTime = parseInt(localStorage.getItem('cmibric_updated_at')) || 0;
 
     if (doc.exists) {
@@ -854,7 +854,7 @@ async function pushToCloud() {
   if (!currentUser) return;
   try {
     const now = Date.now();
-    await fireDb.collection('users').doc(currentUser.uid).set({
+    await fireDb.collection('preventivi').doc('main').set({
       settings: state.settings,
       quotes: state.quotes,
       nextNumber: state.nextNumber,
