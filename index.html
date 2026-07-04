@@ -11,6 +11,9 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml" sizes="any">
 <link rel="apple-touch-icon" href="icon.svg">
 <title>CM IBRIC - Preventivi</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <style>
 :root {
   --primary: #0f766e;
@@ -556,6 +559,7 @@ textarea { resize: vertical; min-height: 60px; }
   </div>
   <div class="nav-actions">
     <button class="btn btn-primary" onclick="openNewQuote()">+ Nuovo</button>
+    <span id="sync-status" title="Cloud" style="font-size:1.1rem;cursor:default;opacity:0.7">☁️</span>
     <button class="btn btn-ghost" onclick="openSettings()" title="Impostazioni">⚙️</button>
   </div>
 </header>
@@ -754,6 +758,118 @@ let state = {
 let backupNotified = false;
 
 // ============================================
+// FIREBASE / CLOUD SYNC
+// ============================================
+const firebaseConfig = {
+  apiKey: "AIzaSyBiGqzbNXEmsaVYjWHjm-sNH89Zl0709n4",
+  authDomain: "cmibric-preventivi.firebaseapp.com",
+  projectId: "cmibric-preventivi",
+  storageBucket: "cmibric-preventivi.firebasestorage.app",
+  messagingSenderId: "295095657607",
+  appId: "1:295095657607:web:fd2f9c9ae77659cfac0422"
+};
+
+let fireAuth = null;
+let fireDb = null;
+let currentUser = null;
+let syncStatus = 'offline';
+let syncInProgress = false;
+
+try {
+  const app = firebase.initializeApp(firebaseConfig);
+  fireAuth = firebase.auth(app);
+  fireDb = firebase.firestore(app);
+  fireDb.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+  fireAuth.onAuthStateChanged(user => {
+    currentUser = user;
+    if (user) {
+      syncStatus = 'connecting';
+      updateSyncUI();
+      syncFromCloud();
+    } else {
+      syncStatus = 'offline';
+      updateSyncUI();
+    }
+  });
+  fireAuth.signInAnonymously().catch(() => {});
+} catch (e) {
+  console.warn('Firebase init error', e);
+}
+
+function updateSyncUI() {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  const icons = { offline: '☁️', connecting: '🔄', synced: '☁️', error: '⚠️' };
+  const titles = {
+    offline: 'Cloud non connesso',
+    connecting: 'Connessione...',
+    synced: 'Cloud sincronizzato',
+    error: 'Errore sync'
+  };
+  el.textContent = icons[syncStatus] || '☁️';
+  el.title = titles[syncStatus] || '';
+  el.style.opacity = syncStatus === 'synced' ? '1' : '0.7';
+}
+
+async function syncFromCloud() {
+  if (!currentUser) return;
+  syncInProgress = true;
+  try {
+    const doc = await fireDb.collection('users').doc(currentUser.uid).get();
+    const localTime = parseInt(localStorage.getItem('cmibric_updated_at')) || 0;
+
+    if (doc.exists) {
+      const remote = doc.data();
+      const remoteTime = parseInt(remote.updatedAt) || 0;
+
+      if (remoteTime > localTime) {
+        state.quotes = remote.quotes || [];
+        state.settings = { ...state.settings, ...(remote.settings || {}) };
+        state.nextNumber = remote.nextNumber || 1;
+        try { localStorage.setItem('cmibric_state', JSON.stringify({
+          settings: state.settings, quotes: state.quotes, nextNumber: state.nextNumber
+        })); } catch (e) {}
+        localStorage.setItem('cmibric_updated_at', String(remoteTime));
+        applyColor();
+        renderDashboard();
+        syncStatus = 'synced';
+        showToast('Dati sincronizzati dal cloud', 'success');
+      } else if (localTime > remoteTime) {
+        await pushToCloud();
+      } else {
+        syncStatus = 'synced';
+      }
+    } else {
+      await pushToCloud();
+    }
+  } catch (e) {
+    console.warn('Sync error', e);
+    syncStatus = 'error';
+  }
+  syncInProgress = false;
+  updateSyncUI();
+}
+
+async function pushToCloud() {
+  if (!currentUser) return;
+  try {
+    const now = Date.now();
+    await fireDb.collection('users').doc(currentUser.uid).set({
+      settings: state.settings,
+      quotes: state.quotes,
+      nextNumber: state.nextNumber,
+      updatedAt: now
+    });
+    localStorage.setItem('cmibric_updated_at', String(now));
+    syncStatus = 'synced';
+  } catch (e) {
+    console.warn('Push error', e);
+    syncStatus = 'error';
+  }
+  updateSyncUI();
+}
+
+// ============================================
 // INIT
 // ============================================
 function init() {
@@ -785,7 +901,9 @@ function saveData() {
       quotes: state.quotes,
       nextNumber: state.nextNumber
     }));
+    localStorage.setItem('cmibric_updated_at', String(Date.now()));
   } catch (e) { console.warn('save error', e); }
+  if (!syncInProgress) pushToCloud();
 }
 
 function applyColor() {

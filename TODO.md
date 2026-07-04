@@ -28,7 +28,7 @@ PWA per creare e gestire preventivi per lavori di muratura e pitturazione.
 
 ### Alta priorità
 - [ ] Inizializzare Git e collegare auto-deploy su Vercel (GitHub → Vercel)
-- [ ] Sync cloud con Firebase Firestore (dati condivisi tra dispositivi)
+- [x] Sync cloud con Firebase Firestore (dati condivisi tra dispositivi)
 - [ ] Separare HTML/CSS/JS in file distinti
 - [ ] Aggiungere gestione IVA (scorporo, importo ivato/non ivato)
 - [ ] Rivedere la numerazione preventivi (formato personalizzabile)
