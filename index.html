@@ -559,7 +559,7 @@ textarea { resize: vertical; min-height: 60px; }
   </div>
   <div class="nav-actions">
     <button class="btn btn-primary" onclick="openNewQuote()">+ Nuovo</button>
-    <span id="sync-status" title="Cloud" style="font-size:1.1rem;cursor:default;opacity:0.7">☁️</span>
+    <span id="sync-status" title="Cloud" style="font-size:1.1rem;cursor:pointer;opacity:0.7" onclick="manualSync()">☁️</span>
     <button class="btn btn-ghost" onclick="openSettings()" title="Impostazioni">⚙️</button>
   </div>
 </header>
@@ -689,6 +689,12 @@ textarea { resize: vertical; min-height: 60px; }
       <button class="btn btn-primary" onclick="saveSettings()">💾 Salva Impostazioni</button>
     </div>
   </div>
+  <div class="card" style="margin-top:1rem;">
+    <div class="card-header"><h2 class="card-title">Cloud Firebase</h2></div>
+    <p id="firebase-status" style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.75rem;">Stato: <strong id="fb-state">Verifica in corso...</strong></p>
+    <button class="btn btn-outline btn-sm" onclick="testFirebase()">🔍 Test Connessione</button>
+    <span id="fb-test-result" style="margin-left:10px;font-size:0.85rem;"></span>
+  </div>
 </section>
 
 </div>
@@ -773,27 +779,60 @@ let fireAuth = null;
 let fireDb = null;
 let currentUser = null;
 let syncStatus = 'offline';
-let syncInProgress = false;
+let pendingPush = false;
 
-try {
-  const app = firebase.initializeApp(firebaseConfig);
-  fireAuth = firebase.auth(app);
-  fireDb = firebase.firestore(app);
-  fireDb.enablePersistence({ synchronizeTabs: true }).catch(() => {});
-  fireAuth.onAuthStateChanged(user => {
-    currentUser = user;
-    if (user) {
-      syncStatus = 'connecting';
-      updateSyncUI();
-      syncFromCloud();
-    } else {
-      syncStatus = 'offline';
-      updateSyncUI();
-    }
+function initFirebase() {
+  try {
+    const app = firebase.initializeApp(firebaseConfig);
+    fireAuth = firebase.auth(app);
+    fireDb = firebase.firestore(app);
+    fireAuth.onAuthStateChanged(function(user) {
+      currentUser = user;
+      if (user) {
+        syncStatus = 'connecting';
+        updateSyncUI();
+        var s = document.getElementById('fb-state');
+        if (s) s.textContent = 'Autenticato (' + user.uid.slice(0,8) + '...)';
+        syncFromCloud().then(function() {
+          if (pendingPush) { pendingPush = false; pushToCloud(); }
+        });
+      } else {
+        syncStatus = 'offline';
+        updateSyncUI();
+        var s = document.getElementById('fb-state');
+        if (s) s.textContent = 'Non connesso';
+      }
+    });
+    fireAuth.signInAnonymously().catch(function() {});
+  } catch (e) {
+    console.warn('Firebase init error', e);
+  }
+}
+initFirebase();
+
+async function manualSync() {
+  if (syncStatus === 'connecting') return;
+  syncStatus = 'connecting';
+  updateSyncUI();
+  await pushToCloud();
+  await syncFromCloud();
+  showToast('Sync completato', 'success');
+}
+
+function testFirebase() {
+  const result = document.getElementById('fb-test-result');
+  const stateEl = document.getElementById('fb-state');
+  if (!result) return;
+  result.textContent = '⏳';
+  if (!fireAuth) { result.textContent = '❌ Firebase non inizializzato'; return; }
+  if (!currentUser) { result.textContent = '❌ Non autenticato'; return; }
+  result.textContent = '✅ Auth OK (uid: ' + currentUser.uid.slice(0,8) + '...)';
+  if (stateEl) stateEl.textContent = 'Connesso';
+  pushToCloud().then(function() {
+    result.textContent += ' → Firestore scrittura OK';
+  }).catch(function(e) {
+    result.textContent += ' → ❌ ' + e.message;
   });
-  fireAuth.signInAnonymously().catch(() => {});
-} catch (e) {
-  console.warn('Firebase init error', e);
 }
 
 function updateSyncUI() {
@@ -813,60 +852,57 @@ function updateSyncUI() {
 
 async function syncFromCloud() {
   if (!currentUser) return;
-  syncInProgress = true;
   try {
     const doc = await fireDb.collection('preventivi').doc('main').get();
     const localTime = parseInt(localStorage.getItem('cmibric_updated_at')) || 0;
-
     if (doc.exists) {
       const remote = doc.data();
       const remoteTime = parseInt(remote.updatedAt) || 0;
-
-      if (remoteTime > localTime) {
-        state.quotes = remote.quotes || [];
+      if (remoteTime > localTime && remote.quotes && remote.quotes.length > 0) {
+        state.quotes = remote.quotes;
         state.settings = { ...state.settings, ...(remote.settings || {}) };
         state.nextNumber = remote.nextNumber || 1;
-        try { localStorage.setItem('cmibric_state', JSON.stringify({
+        localStorage.setItem('cmibric_state', JSON.stringify({
           settings: state.settings, quotes: state.quotes, nextNumber: state.nextNumber
-        })); } catch (e) {}
+        }));
         localStorage.setItem('cmibric_updated_at', String(remoteTime));
         applyColor();
         renderDashboard();
-        syncStatus = 'synced';
         showToast('Dati sincronizzati dal cloud', 'success');
-      } else if (localTime > remoteTime) {
-        await pushToCloud();
-      } else {
-        syncStatus = 'synced';
       }
-    } else {
-      await pushToCloud();
     }
+    if (!doc.exists || localTime > 0) {
+      pushToCloud();
+    }
+    syncStatus = 'synced';
   } catch (e) {
     console.warn('Sync error', e);
     syncStatus = 'error';
+    showToast('Errore sync: ' + e.message, 'error');
   }
-  syncInProgress = false;
   updateSyncUI();
 }
 
 async function pushToCloud() {
-  if (!currentUser) return;
+  if (!fireDb || !currentUser) { pendingPush = true; return; }
   try {
     const now = Date.now();
-    await fireDb.collection('preventivi').doc('main').set({
+    const data = {
       settings: state.settings,
       quotes: state.quotes,
       nextNumber: state.nextNumber,
       updatedAt: now
-    });
+    };
+    await fireDb.collection('preventivi').doc('main').set(data);
     localStorage.setItem('cmibric_updated_at', String(now));
     syncStatus = 'synced';
+    updateSyncUI();
   } catch (e) {
     console.warn('Push error', e);
     syncStatus = 'error';
+    updateSyncUI();
+    showToast('Errore sync: ' + e.message, 'error');
   }
-  updateSyncUI();
 }
 
 // ============================================
@@ -903,7 +939,7 @@ function saveData() {
     }));
     localStorage.setItem('cmibric_updated_at', String(Date.now()));
   } catch (e) { console.warn('save error', e); }
-  if (!syncInProgress) pushToCloud();
+  pushToCloud();
 }
 
 function applyColor() {
